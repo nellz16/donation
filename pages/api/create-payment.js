@@ -6,6 +6,7 @@ export default async function handler(req, res) {
     const { name, amount, message, anon, deviceId, order_id } = req.body;
     const parsedAmount = parseInt(amount, 10);
 
+    // Simpan pending donasi ke Redis
     await recordPending({ name, amount: parsedAmount, anon, deviceId, orderId: order_id });
 
     const snap = new midtransClient.Snap({
@@ -27,6 +28,7 @@ export default async function handler(req, res) {
     };
 
     const payment = await snap.createTransaction(parameter);
+    // Buka redirect_url di tab baru
     res.status(200).json({ redirect_url: payment.redirect_url });
   } catch (error) {
     console.error('Error in create-payment:', error);
