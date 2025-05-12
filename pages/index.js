@@ -6,7 +6,11 @@ import axios from 'axios';
 import { useDonations } from '../context/DonationContext';
 const fetcher = url => axios.get(url).then(r => r.data);
 export default function Home() {
-  const { data, error } = useSWR('/api/donations', fetcher, { refreshInterval: 5000 });
+  const { data, error } = useSWR('/api/donations', fetcher, { fallbackData: {
+        total: 0,
+        leaderboard: [],
+        recent: []
+      }});
   const { setStats } = useDonations();
   if (data) setStats(data);
   return (
