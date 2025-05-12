@@ -1,9 +1,22 @@
-import 'normalize.css';
+@import-normalize;
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Custom Fluid Typography */
 html {
   font-size: clamp(16px, 2vw, 18px);
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #f9fafb;
+  color: #111827;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
 }
