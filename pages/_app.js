@@ -1,4 +1,4 @@
-import 'styles/globals.css';
+import '../styles/globals.css';
 import { DonationProvider } from '../context/DonationContext';
 import Head from 'next/head';
 export default function MyApp({ Component, pageProps }) {
