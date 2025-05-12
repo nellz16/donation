@@ -1,4 +1,6 @@
+import { Redis } from '@upstash/redis';
 import midtransClient from 'midtrans-client';
+const redis = new Redis({ url, token });
 export default async function handler(req, res) {
   try {
     const { name, amount, message, anon, deviceId, order_id } = req.body;
@@ -11,4 +13,9 @@ export default async function handler(req, res) {
     console.error('create-payment error:', e);
     res.status(500).json({ error: 'Gagal membuat transaksi' });
   }
+
+  await redis.lpush('donation:pending', JSON.stringify({
+    orderId, name, amount: parsed, anon, deviceId, ts: Date.now()
+  }));
+  res.json({ redirect_url: payment.redirect_url });
 }
