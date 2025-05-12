@@ -3,7 +3,7 @@ import { recordDonation } from '../../server/db';
 
 export default async function handler(req, res) {
   try {
-    const { name, amount, message, anon, deviceId, orderId } = req.body;
+    const { name, amount, message, anon, deviceId, order_id } = req.body;
     const parsedAmount = parseInt(amount, 10);
 
     // 1) Buat transaksi di Midtrans Snap
@@ -15,7 +15,7 @@ export default async function handler(req, res) {
 
     const parameter = {
       transaction_details: {
-        order_id: orderId,
+        order_id,
         gross_amount: parsedAmount,
       },
       credit_card: {
@@ -36,7 +36,7 @@ export default async function handler(req, res) {
       message: message || '',
       anon,
       deviceId,
-      orderId,
+      orderId: order_id,
       pending: true,       // flag kalau masih pending
     });
 
