@@ -22,3 +22,12 @@ export async function getStats() {
   const recent = recentRaw.map(str => JSON.parse(str));
   return { total, leaderboard, recent };
 }
+
+export async function getAllTransactions() {
+  const pending = await redis.lrange('donation:pending', 0, -1);
+  const success = await redis.lrange('donation:list', 0, -1);
+  return {
+    pending: pending.map(JSON.parse),
+    success: success.map(JSON.parse),
+  };
+}
