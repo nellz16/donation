@@ -12,8 +12,13 @@ export default async function handler(req, res) {
       await redis.lrem('donation:pending', 0, JSON.stringify(obj));
       await recordSuccess(obj);
     }
-    const { name, amount, anon, deviceId } = JSON.parse(rest.raw_message || '{}');
-    await recordSuccess({ name, amount, anon, deviceId, orderId: order_id });
+    const entry = pendings
+     .map(str => JSON.parse(str))
+     .find(d => d.orderId === order_id);
+     if (entry) {
+      await redis.lrem('donation:pending', 0, JSON.stringify(entry));
+      await recordSuccess(entry);
+     }
   }
   res.status(200).send('OK');
 }
