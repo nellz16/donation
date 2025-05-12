@@ -9,14 +9,22 @@ html {
 }
 
 body {
-  background-color: #f9fafb;
+  background-color: #f3f4f6;
   color: #111827;
   line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
+  font-family: 'Inter', sans-serif;
 }
 
-img {
-  max-width: 100%;
-  height: auto;
-  display: block;
+.container {
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+input, textarea, button {
+  font-family: inherit;
+}
+
+.button-primary {
+  @apply bg-primary text-white py-2 px-4 rounded-lg shadow-md hover:bg-blue-700 transition;
 }
