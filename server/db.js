@@ -21,15 +21,19 @@ export async function recordDonation({ name, amount, anon, deviceId, orderId }) 
 }
 
 export async function getStats() {
-  // Total donasi
   const total = parseInt(await redis.get(TOTAL_KEY) || '0', 10);
-  // Top 10 leaderboard, descending
-  const raw = await redis.zrevrange(LEADERBOARD_KEY, 0, 9, { withScores: true });
-  // raw = [member1, score1, member2, score2, ...]
+
+  const raw = await redis.zrange(LEADERBOARD_KEY, 0, 9, {
+    rev: true,
+    withScores: true
+  });
+  // raw = ['Nama1::id','1000','Nama2::id','900', …]
+
   const leaderboard = [];
   for (let i = 0; i < raw.length; i += 2) {
-    const [name, deviceId] = raw[i].split('::');
+    const [name] = raw[i].split('::');
     leaderboard.push({ name, total: parseInt(raw[i+1], 10) });
   }
+
   return { total, leaderboard };
 }
