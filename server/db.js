@@ -3,7 +3,19 @@ const redis = new Redis({ url: process.env.REDIS_URL, token: process.env.REDIS_T
 const TOTAL_KEY = 'donation:total';
 const LEADERBOARD_KEY = 'donation:leaderboard';
 
-// Record successful donation: update total and leaderboard, maintain recent list
+export async function recordPending(id, name, amount) {
+  const key = `donation:${id}`;
+  const value = JSON.stringify({
+    name,
+    amount,
+    status: 'Pending',
+    ts: Date.now()
+  });
+
+  await redis.set(key, value);
+  await redis.expire(key, 3600); // 1 jam
+}
+
 export async function recordSuccess({ name, amount, anon, deviceId, orderId }) {
   await redis.incrby(TOTAL_KEY, amount);
   if (!anon) {
