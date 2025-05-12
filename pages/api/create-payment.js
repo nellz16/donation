@@ -6,7 +6,6 @@ export default async function handler(req, res) {
     const { name, amount, message, anon, deviceId, order_id } = req.body;
     const parsedAmount = parseInt(amount, 10);
 
-    // Simpan pending donasi ke Redis
     await recordPending({ name, amount: parsedAmount, anon, deviceId, orderId: order_id });
 
     const snap = new midtransClient.Snap({
