@@ -25,7 +25,7 @@ export async function recordSuccess(pendingObj) {
     await redis.zincrby(LEADERBOARD_KEY, amount, `${name}::${deviceId}`);
   }
 
-  await redis.lpush('donation:list', JSON.stringify({ name, amount, anon, deviceId, orderId, ts: Date.now() }));
+  await redis.lpush('donation:list', JSON.stringify({ name, amount, anon, deviceId, orderId, message, ts: Date.now() }));
   await redis.ltrim('donation:list', 0, 4);
 }
 
