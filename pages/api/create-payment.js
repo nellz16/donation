@@ -28,7 +28,7 @@ export default async function handler(req, res) {
 
     const payment = await snap.createTransaction(parameter);
     // Buka redirect_url di tab baru
-    res.status(200).json({ redirect_url: payment.redirect_url });
+    res.json({ data: { redirect_url: payment.redirect_url } });
   } catch (error) {
     console.error('Error in create-payment:', error);
     res.status(500).json({ error: 'Gagal membuat transaksi' });
