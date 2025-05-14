@@ -1,6 +1,6 @@
 import crypto from 'crypto';
-import { recordSuccess } from '../../server/db';
 import { Redis } from '@upstash/redis';
+import { recordSuccess } from '../../server/db';
 
 const redis = new Redis({ url: process.env.REDIS_URL, token: process.env.REDIS_TOKEN });
 
@@ -30,8 +30,13 @@ export default async function handler(req, res) {
     const pendingStr = await redis.get(`pending:${order_id}`);
     if (pendingStr) {
       const pendingObj = JSON.parse(pendingStr);
+      await redis.del(`pending:${order_id}`);
       await recordSuccess(pendingObj);
+      console.log('Recorded success for', order_id);
+    } else {
+      console.warn('No pending data found for', order_id);
     }
   }
+
   return res.status(200).send('OK');
 }
