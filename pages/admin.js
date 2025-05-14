@@ -2,68 +2,61 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 export default function Admin() {
-  const [auth, setAuth] = useState({ username: '', password: '' });
-  const [loggedIn, setLoggedIn] = useState(false);
-  const [transactions, setTransactions] = useState([]);
-
-  const handleLogin = () => {
-    if (auth.username === 'admin' && auth.password === 'SuperSecret123') {
-      setLoggedIn(true);
-    } else {
-      alert('Creds salah!');
-    }
-  };
+  const [pendingList, setPendingList] = useState([]);
+  const [successList, setSuccessList] = useState([]);
 
   useEffect(() => {
-    if (loggedIn) {
-      axios.get('/api/donations')
-        .then(res => {
-          // untuk demo, kita fetch leaderboard & total,
-          // idealnya buat endpoint khusus untuk full list transaksi
-          setTransactions(res.data.leaderboard);
-        });
-    }
-  }, [loggedIn]);
+    axios.get('/api/transactions').then(res => {
+      setPendingList(res.data.pending || []);
+      setSuccessList(res.data.success || []);
+    });
+  }, []);
 
-  return loggedIn ? (
+  return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Admin Dashboard</h1>
-      <table className="min-w-full bg-white">
-        <thead>
-          <tr>
-            <th>Nama</th>
-            <th>Total Donasi</th>
-          </tr>
-        </thead>
-        <tbody>
-          {transactions.map((t,i) => (
-            <tr key={i}>
-              <td>{t.name}</td>
-              <td>Rp {t.total.toLocaleString()}</td>
+      <section className="mb-8">
+        <h2 className="text-xl font-semibold">Pending Transactions</h2>
+        <table className="min-w-full bg-white mb-4">
+          <thead>
+            <tr>
+              <th>Order ID</th><th>Name</th><th>Amount</th><th>Message</th><th>Timestamp</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  ) : (
-    <div className="max-w-sm mx-auto mt-20 p-4 border rounded">
-      <input
-        className="w-full p-2 mb-2 border rounded"
-        placeholder="Username"
-        onChange={e => setAuth({ ...auth, username: e.target.value })}
-      />
-      <input
-        type="password"
-        className="w-full p-2 mb-2 border rounded"
-        placeholder="Password"
-        onChange={e => setAuth({ ...auth, password: e.target.value })}
-      />
-      <button
-        className="w-full p-2 bg-primary text-white rounded"
-        onClick={handleLogin}
-      >
-        Login
-      </button>
+          </thead>
+          <tbody>
+            {pendingList.map((t, i) => (
+              <tr key={i}>
+                <td>{t.orderId}</td>
+                <td>{t.anon ? 'Anonymous' : t.name}</td>
+                <td>Rp {t.amount.toLocaleString()}</td>
+                <td>{t.message || '-'}</td>
+                <td>{new Date(t.ts).toLocaleString()}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
+      <section>
+        <h2 className="text-xl font-semibold">Successful Transactions</h2>
+        <table className="min-w-full bg-white">
+          <thead>
+            <tr>
+              <th>Order ID</th><th>Name</th><th>Amount</th><th>Message</th><th>Timestamp</th>
+            </tr>
+          </thead>
+          <tbody>
+            {successList.map((t, i) => (
+              <tr key={i}>
+                <td>{t.orderId}</td>
+                <td>{t.anon ? 'Anonymous' : t.name}</td>
+                <td>Rp {t.amount.toLocaleString()}</td>
+                <td>{t.message || '-'}</td>
+                <td>{new Date(t.ts).toLocaleString()}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
     </div>
   );
 }
