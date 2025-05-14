@@ -28,7 +28,13 @@ export default function DonationForm() {
     localStorage.setItem('deviceId', deviceId);
     const order_id = uuidv4();
     const resp = await axios.post('/api/create-payment', { name, amount, message, anon, deviceId, order_id });
-    setQrUrl(resp.data.qr_url);
+console.log('create-payment response:', resp.data);
+const url = resp.data.redirect_url || resp.data.qr_url;
+if (!url) {
+  alert('Gagal mendapatkan URL pembayaran. Coba lagi nanti.');
+  return;
+}
+window.open(url, '_blank');
     setTimeout(() => { setQrUrl(null); alert('Waktu Pembayaran sudah habis, silakan buat transaksi ulang 😊'); }, 3600000);
   };
 
