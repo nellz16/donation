@@ -7,6 +7,7 @@ export default function DonationForm() {
   const [message, setMessage] = useState('');
   const [anon, setAnon] = useState(false);
   const [qrUrl, setQrUrl] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (anon) setName('Anonymous');
