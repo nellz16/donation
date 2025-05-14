@@ -26,19 +26,27 @@ export async function recordSuccess({ name, amount, anon, deviceId, orderId }) {
   await redis.ltrim('donation:list', 0, 4);
 }
 
-// Get stats: total, top 10 leaderboard, recent 5 donations
 export async function getStats() {
   const total = parseInt(await redis.get(TOTAL_KEY) ?? '0', 10);
-  // Upstash Redis client uses zrange with options for scores
+
   const raw = await redis.zrange(LEADERBOARD_KEY, 0, 9, { rev: true, withScores: true });
-  // raw = [member1, score1, member2, score2, ...]
   const leaderboard = [];
   for (let i = 0; i < raw.length; i += 2) {
     const [name] = raw[i].split('::');
     leaderboard.push({ name, total: parseInt(raw[i+1], 10) });
   }
-  // recent donations
+  
   const recentRaw = await redis.lrange('donation:list', 0, 4);
-  const recent = recentRaw.map(str => JSON.parse(str));
+  const recent = [];
+  for (const str of recentRaw) {
+    try {
+      const obj = JSON.parse(str);
+      recent.push(obj);
+    } catch (_e) {
+      // skip invalid JSON
+      continue;
+    }
+  }
+
   return { total, leaderboard, recent };
 }
