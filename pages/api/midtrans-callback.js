@@ -1,6 +1,11 @@
 import crypto from 'crypto';
-import { recordSuccess } from '@/server/db';
-import { redis } from '@/lib/redis';
+import { Redis } from '@upstash/redis';
+import { recordSuccess } from '../../server/db';
+
+const redis = new Redis({
+  url: process.env.REDIS_URL,
+  token: process.env.REDIS_TOKEN
+});
 
 export const config = {
   api: {
