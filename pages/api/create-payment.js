@@ -4,7 +4,7 @@ import { recordPending } from '../../server/db';
 export default async function handler(req, res) {
   try {
     const { name, amount, message, anon, deviceId, order_id } = req.body;
-    const parsed = parseInt(amount, 10);
+    const parsed = parseInt(amount.replace(/\./g, ''), 10);
 
     await recordPending({ name, amount: parsed, anon, deviceId, orderId: order_id });
 
