@@ -1,12 +1,12 @@
 import midtransClient from 'midtrans-client';
-import { recordPending } from '../../server/db'; // or adjust if using pending
+import { recordPending } from '../../server/db';
 
 export default async function handler(req, res) {
   try {
     const { name, amount, message, anon, deviceId, order_id } = req.body;
-    const parsedAmount = parseInt(amount, 10);
+    const parsed = parseInt(amount, 10);
 
-    await recordPending({ name, amount: parsedAmount, anon, deviceId, orderId: order_id });
+    await recordPending({ name, amount: parsed, anon, deviceId, orderId: order_id });
 
     const snap = new midtransClient.Snap({
       isProduction: true,
@@ -15,10 +15,7 @@ export default async function handler(req, res) {
     });
 
     const parameter = {
-      transaction_details: {
-        order_id,
-        gross_amount: parsedAmount,
-      },
+      transaction_details: { order_id, gross_amount: parsed },
       credit_card: { secure: true },
       customer_details: { name: anon ? 'Anonymous' : name },
       callbacks: {
@@ -27,10 +24,9 @@ export default async function handler(req, res) {
     };
 
     const payment = await snap.createTransaction(parameter);
-    // Buka redirect_url di tab baru
-    res.json({ data: { redirect_url: payment.redirect_url } });
-  } catch (error) {
-    console.error('Error in create-payment:', error);
-    res.status(500).json({ error: 'Gagal membuat transaksi' });
+    return res.status(200).json({ redirect_url: payment.redirect_url });
+  } catch (e) {
+    console.error('Error create-payment:', e);
+    return res.status(500).json({ error: 'Gagal membuat transaksi' });
   }
 }
