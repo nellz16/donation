@@ -1,8 +1,12 @@
 import crypto from 'crypto';
-import { Redis } from '@upstash/redis';
-import { recordSuccess } from '../../server/db';
+import { recordSuccess } from '@/server/db';
+import { redis } from '@/lib/redis';
 
-const redis = new Redis({ url: process.env.REDIS_URL, token: process.env.REDIS_TOKEN });
+export const config = {
+  api: {
+    bodyParser: true
+  }
+};
 
 export default async function handler(req, res) {
   const {
@@ -18,7 +22,7 @@ export default async function handler(req, res) {
     .update(order_id + status_code + gross_amount + process.env.MIDTRANS_SERVER_KEY)
     .digest('hex');
 
-  console.log('callback signature_key:', signature_key);
+  console.log('received signature_key:', signature_key);
   console.log('expected signature:', expected);
 
   if (signature_key !== expected) {
@@ -27,14 +31,11 @@ export default async function handler(req, res) {
   }
 
   if (transaction_status === 'settlement') {
-    const pendingStr = await redis.get(`pending:${order_id}`);
-    if (pendingStr) {
-      const pendingObj = JSON.parse(pendingStr);
+    const pending = await redis.get(`pending:${order_id}`);
+    if (pending) {
+      const data = JSON.parse(pending);
       await redis.del(`pending:${order_id}`);
-      await recordSuccess(pendingObj);
-      console.log('Recorded success for', order_id);
-    } else {
-      console.warn('No pending data found for', order_id);
+      await recordSuccess(data);
     }
   }
 
