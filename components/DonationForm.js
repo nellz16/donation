@@ -79,7 +79,7 @@ window.open(url, '_blank');
             placeholder="Tuliskan pesanmu"
           />
         </div>
-        <button className="button-primary w-full" onClick={handleDonate}>Donasi Sekarang</button>
+        <button className="button-primary w-full" onClick={handleDonate}disabled={isLoading}>{isLoading ? 'Sedang Membuat Pembayaran...' : 'Donasi Sekarang'}</button>
       </div>
       {qrUrl && (
         <div className="mt-6 text-center">
